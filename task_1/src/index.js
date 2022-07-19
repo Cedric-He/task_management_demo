@@ -1,26 +1,30 @@
+// use ant design, based on reactJS.
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
+import { Table, Popconfirm, Button, DatePicker,} from 'antd';
 import './index.css';
+
 class Database extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
       data:[{    
         Name: 'Example',
-        Date: new Date("1999-12-30"),
+        Date: new Date(),
         Text: 'HelloWorld',
+        Created_Date: new Date().toString(),
         ID: 0}],
       }
     this.input = {
         Name: 'Example',
-        Date: new Date("1999-12-30"),
+        Date: new Date(),
         Text: 'HelloWorld',
         ID: 0,
       }
   }
   handleChangeName = (e) => this.input.Name = e.target.value
-  handleChangeDate = (e) => this.input.Date = e.target.value
+  handleChangeDate = (date) => this.input.Date = date
   handleChangeText = (e) => this.input.Text = e.target.value
   handleClick = (e) => {
     // Use updater function when new state is derived from old
@@ -33,6 +37,7 @@ class Database extends React.Component {
         Name: input.Name,
         Date: input.Date,
         Text: input.Text,
+        Created_Date: new Date().toString(),
         ID: input.ID,
       }]});
     }
@@ -41,79 +46,74 @@ class Database extends React.Component {
         Name: input.Name,
         Date: input.Date,
         Text: input.Text,
+        Created_Date: new Date().toString(),
         ID: input.ID,
       }])});
   }
     console.log(this.input.Date);
-    console.log(new Date(this.input.Date).getTime());
     this.input.ID++;
   };
 
-  handleRemoveItem = (e,count) => {
+  handleRemoveItem = (count) => {
    console.warn(count);
     const data = this.state.data;
     this.setState({data:data.filter((item) => item.ID !== count)});
     console.log(this.state);
   };
-  handleSortName = (e) => {
-    var data = this.state.data;
-    data.sort((a,b) => a.Name - b.Name);
-    this.setState({data:data});
-  };
-  handleSortDate= (e) => {
-    var data = this.state.data;
-    data.sort((a,b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
-    this.setState({data:data});
-  };
-  handleSortID = (e) => {
-    var data = this.state.data;
-    data.sort((a,b) => a.ID - b.ID);
-    this.setState({data:data});
-  };
   render() {
+    const columns = [
+      {
+        title: 'Name',
+        dataIndex: 'Name',
+        defaultSortOrder: 'descend',
+        sorter: (a, b) => a.Name - b.Name,
+      },
+      {
+        title: 'Date',
+        dataIndex: 'Date',
+        defaultSortOrder: 'descend',
+        sorter: (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
+      },
+      {
+        title: 'Text',
+        dataIndex: 'Text',
+      },
+      {
+        title: 'Created Date',
+        dataIndex: 'Created_Date',
+        defaultSortOrder: 'descend',
+        sorter: (a, b) => new Date(a.Created_Date).getTime() - new Date(b.Created_Date).getTime(),
+      },
+      {
+          title: 'Actions',
+          render: (record) => {
+            return (
+              <Popconfirm title="Delete?" onConfirm={() => this.handleRemoveItem(record.ID)}>
+                <Button>Delete</Button>
+              </Popconfirm>
+            );
+          },
+      }
+  ]
+    const data = this.state.data;
+    data.length > 0?data.forEach(record => record.Date = record.Date.toString()):data.concat();
+    console.log(this.state.data);
     return (
       <>
       <div className = "Inputs">
         <label>Name: </label>
         <input className = "Name" type="text"  onChange={this.handleChangeName} />
         <label>Date: </label>
-        <input className = "Date" type="date" onChange={this.handleChangeDate} />
+        <DatePicker onChange={this.handleChangeDate} />
         <label>Text: </label>
         <input className = "Text" type="text"  onChange={this.handleChangeText} />
-        <button onClick={this.handleClick}>comfirm</button>
+        <Button onClick={this.handleClick} type = "primary">comfirm</Button>
       </div>
-        <div className = "dropdown">
-          <span>sorting attributes</span>
-          <div className ='dropdown-content'>
-            <p onClick={this.handleSortName}>
-              Name
-            </p>
-            <p onClick = {this.handleSortDate} >
-              Date
-            </p>
-            <p onClick = {this.handleSortID}>
-              ID
-            </p>
-          </div>
-        </div>
-
-        <DataList data={this.state.data} onClick = {this.handleRemoveItem}/>
+      <Table dataSource={this.state.data} columns = {columns}/>
         </>
     );
   }
   }
-  function DataList(props){
-    const data = props.data;
-    const items = data.map((item) => 
-      <span key={item.ID} className = "Item">
-        <ul className = "N">{item.Name}   </ul>
-        <ul className = "D">{item.Date.toString()}   </ul>
-        <ul className = "T">{item.Text}</ul>
-        <button className = "close" onClick={(e) => props.onClick(e,item.ID) }>x</button>
-      </span>
-      );
-    return <span>{items}</span>;
-  }
-
+  
   const root = ReactDOM.createRoot(document.getElementById("root"));
   root.render(<Database />);
