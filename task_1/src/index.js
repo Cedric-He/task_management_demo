@@ -1,10 +1,19 @@
 // use ant design, based on reactJS.
 
-import React from 'react';
+import React,{useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Table, Popconfirm, Button, DatePicker,} from 'antd';
-import './index.css';
+import { Table, Popconfirm, Button, DatePicker,Radio,} from 'antd';
+import 'antd/dist/antd.css';
+const RA = (props) => {
 
+  return (
+    <Radio.Group onChange={props.onChange()} value={props.value}>
+      <Radio value={1}>Done</Radio>
+      <Radio value={2}>InProcess</Radio>
+      <Radio value={3}>Cancel</Radio>
+    </Radio.Group>
+  );
+};
 class Database extends React.Component {
   constructor(props) {
     super(props);
@@ -14,7 +23,8 @@ class Database extends React.Component {
         Date: new Date(),
         Text: 'HelloWorld',
         Created_Date: new Date().toString(),
-        ID: 0}],
+        ID: 0,
+        Status:2,}],
       }
     this.input = {
         Name: 'Example',
@@ -60,6 +70,13 @@ class Database extends React.Component {
     this.setState({data:data.filter((item) => item.ID !== count)});
     console.log(this.state);
   };
+  onChange = (e) =>{
+    console.log(e.target.value);
+  }
+  onChangeStatus = (e) =>{
+    var data = this.state.data;
+    data.filter((item) => item.)
+  }
   render() {
     const columns = [
       {
@@ -77,7 +94,12 @@ class Database extends React.Component {
       {
         title: 'Text',
         dataIndex: 'Text',
-      },
+        render: (_,item) => {
+
+          return(<RA
+          onChange = {this.onChangeStatus(item.count)}
+          value = {item.Status}/>)
+      }},
       {
         title: 'Created Date',
         dataIndex: 'Created_Date',
